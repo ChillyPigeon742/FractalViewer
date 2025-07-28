@@ -1,0 +1,3 @@
+package net.alek.fractalviewer.data.asset;
+
+public record Shaders() {}

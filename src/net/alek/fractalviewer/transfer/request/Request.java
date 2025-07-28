@@ -1,12 +1,14 @@
 package net.alek.fractalviewer.transfer.request;
 import net.alek.fractalviewer.data.model.AppData;
+import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public enum Request {
-    GET_APPDATA(AppData.class);
+    GET_APPDATA(AppData.class),
+    GET_SHADER_PROGRAM(ShaderProgramPayload.class);
 
     private final Class<? extends Record> responseClass;
     private static final RequestBus BUS = new RequestBus();
