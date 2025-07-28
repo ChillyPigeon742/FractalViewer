@@ -2,11 +2,13 @@
 out vec4 FragColor;
 uniform vec2 u_resolution;
 uniform float u_invMaxIter;
+uniform float u_aspectRatio;
 
 void main() {
-    vec2 uv = (gl_FragCoord.xy / u_resolution) * 3.0 - vec2(2.0, 1.5);
+    vec2 uv = (gl_FragCoord.xy / u_resolution) * 2.0 - vec2(1.0, 1.0);
+    uv.x *= u_aspectRatio;
+    vec2 c = uv * 1.5 - vec2(0.5, 0.0);
 
-    vec2 c = uv;
     vec2 z = vec2(0.0);
     int max_iter = int(1.0 / u_invMaxIter);
     int i = 0;

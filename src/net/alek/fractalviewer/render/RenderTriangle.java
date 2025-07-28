@@ -24,6 +24,7 @@ public class RenderTriangle {
     public static int shaderProgram = createShaderProgram();
     public static int resolutionLoc = glGetUniformLocation(shaderProgram, "u_resolution");
     public static int invMaxIterLoc = glGetUniformLocation(shaderProgram, "u_invMaxIter");
+    public static int aspectRatioLoc = glGetUniformLocation(shaderProgram, "u_aspectRatio");
 
     public static void renderTriangle() {
         glBindVertexArray(vao);

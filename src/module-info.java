@@ -3,4 +3,5 @@ module net.alek.fractalviewer {
     requires java.desktop;
     requires org.lwjgl.glfw;
     requires org.joml;
+    requires org.lwjgl.tinyfd;
 }
