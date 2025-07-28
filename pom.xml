@@ -12,9 +12,7 @@
         <app.version>${project.version}</app.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <flatlaf.version>3.6.1</flatlaf.version>
-        <lwjgl.version>3.3.1</lwjgl.version>
-        <lwjgl3-awt.version>0.1.8</lwjgl3-awt.version>
+        <lwjgl.version>3.3.6</lwjgl.version>
         <joml-primitives.version>1.10.0</joml-primitives.version>
         <joml.version>1.10.8</joml.version>
         <lwjgl.natives>natives-windows</lwjgl.natives>
@@ -39,24 +37,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>26.0.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.formdev</groupId>
-            <artifactId>flatlaf</artifactId>
-            <version>${flatlaf.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-jawt</artifactId>
+            <artifactId>lwjgl-glfw</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-nuklear</artifactId>
         </dependency>
         <dependency>
             <groupId>org.lwjgl</groupId>
@@ -72,7 +62,25 @@
         </dependency>
         <dependency>
             <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-stb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-tinyfd</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-glfw</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-nuklear</artifactId>
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
         <dependency>
@@ -86,9 +94,14 @@
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
         <dependency>
-            <groupId>org.lwjglx</groupId>
-            <artifactId>lwjgl3-awt</artifactId>
-            <version>${lwjgl3-awt.version}</version>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-stb</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-tinyfd</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
         </dependency>
         <dependency>
             <groupId>org.joml</groupId>
