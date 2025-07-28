@@ -2,14 +2,11 @@ package net.alek.fractalviewer.render;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import org.lwjgl.BufferUtils;
+import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
 
 public class RenderFractal {
 
@@ -18,24 +15,26 @@ public class RenderFractal {
             3.0f, -1.0f,
             -1.0f,  3.0f
     };
+    private static int vao;
+    private static int vbo;
+    private static int resolutionLoc;
+    private static int invMaxIterLoc;
+    private static int aspectRatioLoc;
 
-    public static int vao;
-    public static int vbo;
-    public static int shaderProgram;
-    public static int resolutionLoc;
-    public static int invMaxIterLoc;
-    public static int aspectRatioLoc;
-
-    public static void initializeGLData(){
+    public static void generateGLData(){
         vao = glGenVertexArrays();
         vbo = glGenBuffers();
-        shaderProgram = createShaderProgram();
+
+        ShaderProgramPayload shaderProgramPayload =
+                (ShaderProgramPayload) Request.GET_SHADER_PROGRAM.request().await().get();
+        int shaderProgram = shaderProgramPayload.shaderProgram();
+
         resolutionLoc = glGetUniformLocation(shaderProgram, "u_resolution");
         invMaxIterLoc = glGetUniformLocation(shaderProgram, "u_invMaxIter");
         aspectRatioLoc = glGetUniformLocation(shaderProgram, "u_aspectRatio");
     }
 
-    public static void renderFractal() {
+    public static void uploadGLData() {
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -50,17 +49,8 @@ public class RenderFractal {
         glClearColor(0.1f, 0.1f, 0.1f, 1f);
     }
 
-    public static String loadShaderSource(String filepath) {
-        try {
-            Path file = Path.of(Objects.requireNonNull(
-                    RenderFractal.class.getResource(filepath)).toURI());
-            return new String(Files.readAllBytes(file));
-        } catch (IOException | URISyntaxException e) {
-            System.err.println("Failed to load shader file: " + filepath);
-            System.exit(-1);
-            return null;
-        }
+    private static void cleanupGLData() {
+        glDeleteBuffers(vbo);
+        glDeleteVertexArrays(vao);
     }
-
-
 }

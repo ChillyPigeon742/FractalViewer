@@ -11,20 +11,17 @@ public class ShaderCompiler {
     private static int shaderProgram;
 
     static {
-        Request.GET_SHADER_PROGRAM.handle(() -> getShaderProgram());
+        Request.GET_SHADER_PROGRAM.handle(ShaderCompiler::getShaderProgram);
     }
 
-    private static void createShaderProgram() {
-        String vertexSource = loadShaderSource("/assets/fractalviewer/shaders/vertex.glsl");
-        String fragmentSource = loadShaderSource("/assets/fractalviewer/shaders/fragment.glsl");
-
+    private static void createShaderProgram(String vertexShaderSource, String fragmentShaderSource) {
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, vertexSource);
+        glShaderSource(vertexShader, vertexShaderSource);
         glCompileShader(vertexShader);
         checkCompileErrors(vertexShader, "VERTEX");
 
         int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, fragmentSource);
+        glShaderSource(fragmentShader, fragmentShaderSource);
         glCompileShader(fragmentShader);
         checkCompileErrors(fragmentShader, "FRAGMENT");
 

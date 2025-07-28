@@ -1,23 +1,20 @@
 package net.alek.fractalviewer.render;
 
-import net.alek.fractalviewer.transfer.request.Request;
-import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
-import net.alek.fractalviewer.ui.CreateWindow;
+import net.alek.fractalviewer.transfer.event.payload.WindowDataPayload;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
 public class DrawCycle {
     private static boolean redraw = true;
-    private static final long window;
-    private static final int width;
-    private static final int height;
+    private static long window;
+    private static int width;
+    private static int height;
 
-    private static void initalizeDrawCycle(w) {
-        ShaderProgramPayload windowData = (ShaderProgramPayload) Request.GET_WINDOW_DATA.request().await().get();
+    private static void initalizeDrawCycle(WindowDataPayload windowData) {
         window = windowData.window();
-         = windowData.window();
-        window = windowData.window();
+        width = windowData.width();
+        height = windowData.height();
 
         while (!glfwWindowShouldClose(window)) {
             if (redraw) {

@@ -2,9 +2,9 @@ package net.alek.fractalviewer.core;
 
 import net.alek.fractalviewer.render.RenderFractal;
 import net.alek.fractalviewer.render.DrawCycle;
+import net.alek.fractalviewer.transfer.event.payload.WindowDataPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
-import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
@@ -76,10 +76,10 @@ public class Glow {
     }
 
     private static void setupCallbacks() {
-        glfwSetWindowSizeCallback(window, (win, wid, heigh) -> {
-            glViewport(0, 0, wid, heigh);
+        glfwSetWindowSizeCallback(window, (win, widt, heigh) -> {
+            glViewport(0, 0, widt, heigh);
 
-            width = wid;
+            width = widt;
             height = heigh;
             redraw = true;
         });
@@ -87,8 +87,8 @@ public class Glow {
         glfwSetWindowCloseCallback(window, win -> glfwSetWindowShouldClose(win, true));
     }
 
-    private static ShaderProgramPayload getWindowData(){
-        return new ShaderProgramPayload(window, width, height);
+    private static WindowDataPayload getWindowData(){
+        return new WindowDataPayload(window, width, height);
     }
 
     private static void cleanup() {
