@@ -3,14 +3,16 @@ package net.alek.fractalviewer.core;
 import net.alek.fractalviewer.core.log.LogType;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
+import net.alek.fractalviewer.ui.util.MessageUtility;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ErrorHandler {
+    private static final int MAX_MSG_LENGTH = 250;
+
     static {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Exception(throwable));
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> handleException(throwable));
     }
 
     private static String getCallerInfo() {
@@ -25,22 +27,46 @@ public class ErrorHandler {
         return "UnknownCaller";
     }
 
-    private static void handleException(String name, String cause, String message, String packageName, String stackTrace){
+    private static void handleException(Throwable t) {
         String caller = getCallerInfo();
-
-        Event.LOG.publish(new LogPayload(LogType.INFO,
-                name+"/"+caller+"/The Program has Suffered an "+name+"!"));
-
-
-    }
-
-    public static void Exception(Throwable t) {
-        String name = t.getClass().getSimpleName();
+        String exceptionName = t.getClass().getSimpleName();
         String packageName = t.getClass().getName();
         String cause = (t.getCause() != null) ? t.getCause().toString() : "No cause";
-        String message = t.getMessage();
-        String stackTrace = Arrays.toString(t.getStackTrace());
+        String message = (t.getMessage() != null) ? t.getMessage() : "No message";
 
-        handleException(name, cause, message, packageName, stackTrace);
+        // Get full stack trace as string
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        String stackTraceStr = sw.toString();
+
+        // Log short summary
+        Event.LOG.publish(new LogPayload(LogType.ERROR,
+                exceptionName + "/" + caller + "/The Program has suffered an " + exceptionName + "!"));
+
+        // Build user-friendly error message
+        StringBuilder userMessage = new StringBuilder();
+        userMessage.append(String.format("%s / %s / The Program has suffered an %s!\n\n", exceptionName, caller, exceptionName));
+        userMessage.append("Details:\n");
+        userMessage.append(String.format("Name: %s\n", exceptionName));
+        userMessage.append(String.format("Cause: %s\n", cause));
+        userMessage.append(String.format("Message: %s\n", message));
+        userMessage.append(String.format("Package: %s\n\n", packageName));
+        userMessage.append("Stack Trace:\n");
+        userMessage.append(stackTraceStr);
+
+        // Show message box with full info
+        MessageUtility.ErrorMessage(sanitizeMessage(userMessage.toString()));
+    }
+
+    private static String sanitizeMessage(String msg) {
+        if (msg.length() > MAX_MSG_LENGTH) {
+            return msg.substring(0, MAX_MSG_LENGTH) + "\n\n[Message truncated...]";
+        }
+        return msg;
+    }
+
+
+    public static void Exception(Throwable t) {
+        handleException(t);
     }
 }

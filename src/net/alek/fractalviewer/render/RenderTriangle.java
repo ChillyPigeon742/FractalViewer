@@ -19,12 +19,21 @@ public class RenderTriangle {
             -1.0f,  3.0f
     };
 
-    public static int vao = glGenVertexArrays();
-    public static int vbo = glGenBuffers();
-    public static int shaderProgram = createShaderProgram();
-    public static int resolutionLoc = glGetUniformLocation(shaderProgram, "u_resolution");
-    public static int invMaxIterLoc = glGetUniformLocation(shaderProgram, "u_invMaxIter");
-    public static int aspectRatioLoc = glGetUniformLocation(shaderProgram, "u_aspectRatio");
+    public static int vao;
+    public static int vbo;
+    public static int shaderProgram;
+    public static int resolutionLoc;
+    public static int invMaxIterLoc;
+    public static int aspectRatioLoc;
+
+    public static void initalizeData(){
+        vao = glGenVertexArrays();
+        vbo = glGenBuffers();
+        shaderProgram = createShaderProgram();
+        resolutionLoc = glGetUniformLocation(shaderProgram, "u_resolution");
+        invMaxIterLoc = glGetUniformLocation(shaderProgram, "u_invMaxIter");
+        aspectRatioLoc = glGetUniformLocation(shaderProgram, "u_aspectRatio");
+    }
 
     public static void renderTriangle() {
         glBindVertexArray(vao);

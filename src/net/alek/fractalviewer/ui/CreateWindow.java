@@ -2,6 +2,9 @@ package net.alek.fractalviewer.ui;
 
 import net.alek.fractalviewer.render.RenderLoop;
 import net.alek.fractalviewer.render.RenderTriangle;
+import net.alek.fractalviewer.transfer.event.type.Event;
+import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
@@ -13,11 +16,14 @@ public class CreateWindow {
     public static int height = 600;
     public static boolean redraw = true;
 
+    static {
+        Event.INIT_GUI.subscribe(SubscribeMethod.SYNC, ignored -> createWindow());
+    }
+
     public static void createWindow() {
         initGLFW();
         createGLFWWindow();
         setupCallbacks();
-        initOpenGL();
         RenderTriangle.renderTriangle();
 
         System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
@@ -47,17 +53,24 @@ public class CreateWindow {
     }
 
     private static void createGLFWWindow() {
+        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        int xpos = (vidmode.width() - width) / 2;
+        int ypos = (vidmode.height() - height) / 2;
+
         window = glfwCreateWindow(width, height, "Fractal Viewer", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create GLFW window");
         }
+        glfwSetWindowPos(window, xpos, ypos);
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
+        RenderTriangle.initalizeData();
 
         glfwSwapInterval(1);
         glViewport(0, 0, width, height);
+        redraw = true;
     }
 
     private static void setupCallbacks() {
@@ -72,17 +85,11 @@ public class CreateWindow {
         glfwSetWindowCloseCallback(window, win -> glfwSetWindowShouldClose(win, true));
     }
 
-    private static void initOpenGL() {
-        glEnable(GL_DEBUG_OUTPUT);
-        redraw = true;
-    }
-
     private static void cleanup() {
         glDeleteBuffers(RenderTriangle.vbo);
         glDeleteVertexArrays(RenderTriangle.vao);
 
         glfwDestroyWindow(window);
         glfwTerminate();
-        System.exit(0);
     }
 }

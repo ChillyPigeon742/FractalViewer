@@ -22,7 +22,6 @@ public enum Event {
         this.payloadType = payloadType;
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Record> Class<T> getPayloadType() {
         return (Class<T>) payloadType;
     }

@@ -15,9 +15,10 @@ public class Ignition {
     }
 
     private static void startApp() {
-        Event.LOG.publish(new LogPayload(LogType.INFO, "Starting Engine..."));
-        Event.LOG.publish(new LogPayload(LogType.INFO, "Button Clicker "+ Spark.getAppData().version()));
-        Event.LOG.publish(new LogPayload(LogType.INFO, "Initializing JavaFX..."));
+        Event.LOG.publish(new LogPayload(LogType.INFO, "Starting App..."));
+        Event.LOG.publish(new LogPayload(LogType.INFO, "Fractal Viewer "+ Spark.getAppData().version()));
+
+        ErrorHandler.Exception(new Throwable());
 
         Event.INIT_GUI.publish(null);
     }

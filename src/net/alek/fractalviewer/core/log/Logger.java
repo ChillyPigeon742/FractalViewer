@@ -9,7 +9,6 @@ import net.alek.fractalviewer.transfer.request.Request;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,14 +24,15 @@ public class Logger {
     private static final Object lock = new Object();
     private static final boolean debug;
     private static final Path logPath;
+    private static final Path logFile;
 
     static {
         AppData appData = (AppData) Request.GET_APPDATA.request().await().get();
         debug = appData.debugMode();
         logPath = appData.LOGS_PATH();
 
-        String logFileName = "BC-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log";
-        Path logFile = Paths.get(String.valueOf(logPath), logFileName);
+        String logFileName = "FractalViewer-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log";
+        logFile = Path.of(String.valueOf(logPath), logFileName);
         try {
             Files.createFile(logFile);
         } catch (IOException e) {
@@ -46,7 +46,7 @@ public class Logger {
 
     private static void setupLogger() {
         try {
-            fileStream = new PrintStream(Files.newOutputStream(logPath, StandardOpenOption.APPEND), true);
+            fileStream = new PrintStream(Files.newOutputStream(logFile, StandardOpenOption.APPEND), true);
             terminalStream = System.out;
             PrintStream originalOut = System.out;
             PrintStream originalErr = System.err;
@@ -61,13 +61,22 @@ public class Logger {
 
     private static String getCallerInfo() {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+
         for (StackTraceElement element : stackTrace) {
             String className = element.getClassName();
-            if (!className.equals(Logger.class.getName())) {
-                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
-                return simpleClassName + ":" + element.getLineNumber();
+
+            if (
+                    className.startsWith("java.util.concurrent") ||
+                            className.equals(Logger.class.getName()) ||
+                            className.equals("net.alek.fractalviewer.transfer.event.EventBus")
+            ) {
+                continue;
             }
+
+            String simpleName = className.substring(className.lastIndexOf('.') + 1);
+            return simpleName + ":" + element.getLineNumber();
         }
+
         return "UnknownCaller";
     }
 

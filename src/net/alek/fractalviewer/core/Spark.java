@@ -12,9 +12,7 @@ import java.lang.module.ResolvedModule;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public class Spark {
     private static AppData appData;
@@ -62,7 +60,6 @@ public class Spark {
         createDir(logDir);
 
         createFile(dataDir.resolve("settings.json"));
-        createFile(dataDir.resolve("saves.bcs"));
     }
 
     private static void createDir(Path directory){
@@ -110,6 +107,8 @@ public class Spark {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) classLoader = ClassLoader.getSystemClassLoader();
 
+        List<String> failedClasses = Collections.synchronizedList(new ArrayList<>());
+
         try (ModuleReader reader = modRefOpt.get().open()) {
             ClassLoader finalClassLoader = classLoader;
             reader.list()
@@ -119,12 +118,19 @@ public class Spark {
                     .forEach(className -> {
                         try {
                             Class.forName(className, true, finalClassLoader);
-                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                            System.err.printf("Failed to load class: %s%n", className);
+                        } catch (Throwable e) {
+                            failedClasses.add(className);
                             e.printStackTrace();
-                            System.exit(className.hashCode());
                         }
                     });
+
+            if (!failedClasses.isEmpty()) {
+                System.err.println("Eager classload failed for:");
+                for (String fail : failedClasses) {
+                    System.err.println(" - " + fail);
+                }
+                System.exit(1);
+            }
         } catch (IOException e) {
             System.err.printf("Failed to open ModuleReader for module: %s%n", basePackage);
             e.printStackTrace();

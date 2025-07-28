@@ -14,7 +14,7 @@ public class RenderLoop {
         glBindVertexArray(RenderTriangle.vao);
 
         float aspectRatio = (float) CreateWindow.width / (float) CreateWindow.height;
-        glUniform2f(RenderTriangle.resolutionLoc, (float) 1920, (float) 1080);
+        glUniform2f(RenderTriangle.resolutionLoc, (float) CreateWindow.width, (float) CreateWindow.height);
         glUniform1f(RenderTriangle.invMaxIterLoc, 1.0f / 50.0f);
         glUniform1f(RenderTriangle.aspectRatioLoc, aspectRatio);
 
