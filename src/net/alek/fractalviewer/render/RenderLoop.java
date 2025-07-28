@@ -12,11 +12,15 @@ public class RenderLoop {
 
         glUseProgram(RenderTriangle.shaderProgram);
         glBindVertexArray(RenderTriangle.vao);
+
         glUniform2f(RenderTriangle.resolutionLoc, (float) CreateWindow.width, (float) CreateWindow.height);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glUniform1f(RenderTriangle.invMaxIterLoc, 1.0f / 100.0f);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
         glUseProgram(0);
+
         glfwSwapBuffers(CreateWindow.window);
     }
 }

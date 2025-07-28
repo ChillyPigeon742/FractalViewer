@@ -2,16 +2,10 @@ package net.alek.fractalviewer.ui;
 
 import net.alek.fractalviewer.render.RenderLoop;
 import net.alek.fractalviewer.render.RenderTriangle;
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
-
-import java.nio.FloatBuffer;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static net.alek.fractalviewer.render.RenderTriangle.shaderProgram;
 
 public class CreateWindow {
     public static long window;
@@ -25,6 +19,7 @@ public class CreateWindow {
         setupCallbacks();
         initOpenGL();
         RenderTriangle.renderTriangle();
+
         System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
 
         while (!glfwWindowShouldClose(window)) {
@@ -60,13 +55,14 @@ public class CreateWindow {
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
+
+        glfwSwapInterval(1);
         glViewport(0, 0, width, height);
     }
 
     private static void setupCallbacks() {
         glfwSetWindowSizeCallback(window, (win, wid, heigh) -> {
             glViewport(0, 0, wid, heigh);
-            updateProjectionMatrix(wid, heigh);
 
             width = wid;
             height = heigh;
@@ -78,28 +74,7 @@ public class CreateWindow {
 
     private static void initOpenGL() {
         glEnable(GL_DEBUG_OUTPUT);
-
-        int[] width = new int[1];
-        int[] height = new int[1];
-        glfwGetWindowSize(window, width, height);
-        updateProjectionMatrix(width[0], height[0]);
-    }
-
-    private static void updateProjectionMatrix(int width, int height) {
-        float aspect = (float) width / height;
-        Matrix4f projection = new Matrix4f().ortho2D(-aspect, aspect, -1f, 1f);
-
-        int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-
-        glUseProgram(shaderProgram);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            FloatBuffer fb = stack.mallocFloat(16);
-            projection.get(fb);
-            glUniformMatrix4fv(projectionLoc, false, fb);
-        }
-
-        glUseProgram(0);
+        redraw = true;
     }
 
     private static void cleanup() {
