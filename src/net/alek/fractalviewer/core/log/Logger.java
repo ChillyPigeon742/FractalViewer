@@ -4,7 +4,7 @@ import net.alek.fractalviewer.data.model.AppData;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
-import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.transfer.request.type.Request;
 
 import java.io.*;
 import java.nio.file.Files;

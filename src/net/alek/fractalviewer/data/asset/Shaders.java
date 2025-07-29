@@ -1,3 +1,3 @@
 package net.alek.fractalviewer.data.asset;
 
-public record Shaders() {}
+public record Shaders(String vertexShaderSource, String fragmentShaderSource) {}

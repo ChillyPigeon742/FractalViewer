@@ -1,5 +1,7 @@
 package net.alek.fractalviewer.transfer.request;
 
+import net.alek.fractalviewer.transfer.request.type.Request;
+
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
@@ -8,16 +10,13 @@ public class RequestBus {
     private final ExecutorService executor = Executors.newCachedThreadPool(r -> {
         Thread t = new Thread(r);
         t.setDaemon(true);
+        t.setName("RequestBus-Executor");
         return t;
     });
 
     private final Map<Request, Supplier<? extends Record>> handlers = new ConcurrentHashMap<>();
 
     public void handle(Request request, Supplier<? extends Record> handler) {
-        Record sampleResponse = handler.get();
-        if (!request.getResponseClass().isInstance(sampleResponse)) {
-            throw new IllegalArgumentException("Handler returns invalid response type for request " + request);
-        }
         handlers.put(request, handler);
     }
 

@@ -2,14 +2,16 @@ package net.alek.fractalviewer.render;
 
 import static org.lwjgl.opengl.GL46.*;
 
-import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.transfer.event.type.Event;
+import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
+import net.alek.fractalviewer.transfer.request.type.Request;
+import net.alek.fractalviewer.transfer.request.payload.FractalDataPayload;
 import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 
 import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 
-public class RenderFractal {
-
+public class FractalData {
     private static final float[] vertices = {
             -1.0f, -1.0f,
             3.0f, -1.0f,
@@ -20,6 +22,18 @@ public class RenderFractal {
     private static int resolutionLoc;
     private static int invMaxIterLoc;
     private static int aspectRatioLoc;
+
+    static {
+        Event.GENERATE_FRACTAL_DATA.subscribe(SubscribeMethod.SYNC, ignored -> generateGLData());
+        Event.UPLOAD_FRACTAL_DATA.subscribe(SubscribeMethod.SYNC, ignored -> uploadGLData());
+        Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> cleanupGLData());
+
+        Request.GET_FRACTAL_DATA.handle(FractalData::getFractalData);
+    }
+
+    private static FractalDataPayload getFractalData() {
+        return new FractalDataPayload(vao, vbo, resolutionLoc, invMaxIterLoc, aspectRatioLoc);
+    }
 
     public static void generateGLData(){
         vao = glGenVertexArrays();

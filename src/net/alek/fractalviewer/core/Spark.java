@@ -2,7 +2,7 @@ package net.alek.fractalviewer.core;
 
 import net.alek.fractalviewer.data.model.AppData;
 import net.alek.fractalviewer.transfer.event.type.Event;
-import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.transfer.request.type.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +48,7 @@ public class Spark {
 
         setupAppDataFolder();
         eagerClassload();
-        Event.START_APP.publish(null);
+        Event.START_APP.publish();
     }
 
     private static void setupAppDataFolder() {

@@ -1,10 +1,12 @@
 package net.alek.fractalviewer.core;
 
-import net.alek.fractalviewer.render.RenderFractal;
-import net.alek.fractalviewer.render.DrawCycle;
-import net.alek.fractalviewer.transfer.event.payload.WindowDataPayload;
+import net.alek.fractalviewer.transfer.event.payload.DrawDataPayload;
+import net.alek.fractalviewer.transfer.request.payload.WindowDataPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
+import net.alek.fractalviewer.transfer.request.type.Request;
+import net.alek.fractalviewer.transfer.request.payload.FractalDataPayload;
+import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
@@ -19,27 +21,25 @@ public class Glow {
 
     static {
         Event.INIT_GUI.subscribe(SubscribeMethod.SYNC, ignored -> createWindow());
+        Request.GET_WINDOW_DATA.handle(Glow::getWindowData);
     }
 
     public static void createWindow() {
         initGLFW();
         createGLFWWindow();
         setupCallbacks();
-        RenderFractal.renderFractal();
+        Event.LOAD_GAME.publish().await();
+
+        Event.COMPILE_SHADERS.publish();
+        Event.UPLOAD_FRACTAL_DATA.publish();
+
+        ShaderProgramPayload shaderProgramPayload = (ShaderProgramPayload) Request.GET_SHADER_PROGRAM.request().await().get();
+        FractalDataPayload fractalDataPayload = (FractalDataPayload) Request.GET_FRACTAL_DATA.request().await().get();
+
+        Event.REFRESH_DRAW_DATA.publish(new DrawDataPayload(getWindowData(), shaderProgramPayload, fractalDataPayload));
+        Event.INITIALIZE_DRAW_CYCLE.publish();
 
         System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
-
-        while (!glfwWindowShouldClose(window)) {
-            if (redraw) {
-                glfwPollEvents();
-                DrawCycle.render();
-                redraw = false;
-            } else {
-                glfwWaitEvents();
-            }
-        }
-
-        cleanup();
     }
 
     private static void initGLFW() {
@@ -68,11 +68,11 @@ public class Glow {
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        RenderFractal.initializeData();
+        Event.GENERATE_FRACTAL_DATA.publish();
 
         glfwSwapInterval(1);
         glViewport(0, 0, width, height);
-        redraw = true;
+        Event.MARK_DRAW_DIRTY.publish();
     }
 
     private static void setupCallbacks() {
@@ -81,7 +81,7 @@ public class Glow {
 
             width = widt;
             height = heigh;
-            redraw = true;
+            Event.MARK_DRAW_DIRTY.publish();
         });
 
         glfwSetWindowCloseCallback(window, win -> glfwSetWindowShouldClose(win, true));

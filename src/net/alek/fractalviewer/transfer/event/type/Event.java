@@ -2,6 +2,7 @@ package net.alek.fractalviewer.transfer.event.type;
 
 import net.alek.fractalviewer.transfer.event.EventBus;
 import net.alek.fractalviewer.transfer.event.payload.CloseAppPayload;
+import net.alek.fractalviewer.transfer.event.payload.DrawDataPayload;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
 
 import java.util.function.Consumer;
@@ -12,6 +13,12 @@ public enum Event {
     INIT_GUI(null),
     GUI_READY(null),
     LOAD_GAME(null),
+    COMPILE_SHADERS(null),
+    GENERATE_FRACTAL_DATA(null),
+    UPLOAD_FRACTAL_DATA(null),
+    REFRESH_DRAW_DATA(DrawDataPayload.class),
+    INITIALIZE_DRAW_CYCLE(null),
+    MARK_DRAW_DIRTY(null),
     UNLOAD_GAME(null),
     CLOSE_APP(CloseAppPayload.class);
 
@@ -30,8 +37,12 @@ public enum Event {
         BUS.subscribe(this, mode, handler);
     }
 
-    public <T extends Record> void publish(T payload) {
-        BUS.publish(this, payload);
+    public <T extends Record> Awaitable publish(T payload) {
+        return BUS.publish(this, payload);
+    }
+
+    public Awaitable publish() {
+        return BUS.publish(this, null);
     }
 
     public static void shutdown() {

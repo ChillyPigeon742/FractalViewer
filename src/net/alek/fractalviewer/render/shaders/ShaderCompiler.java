@@ -1,17 +1,28 @@
 package net.alek.fractalviewer.render.shaders;
 
-import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.data.asset.Shaders;
+import net.alek.fractalviewer.transfer.event.type.Event;
+import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
+import net.alek.fractalviewer.transfer.request.type.Request;
 import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL46.*;
 
 public class ShaderCompiler {
     private static int shaderProgram;
 
     static {
+        Event.COMPILE_SHADERS.subscribe(SubscribeMethod.SYNC, ignored -> compileShaders());
         Request.GET_SHADER_PROGRAM.handle(ShaderCompiler::getShaderProgram);
+    }
+
+    private static void compileShaders() {
+        Shaders shaders = (Shaders) Request.GET_SHADER_SOURCE.request().await().get();
+
+        String vertexShaderSource = shaders.vertexShaderSource();
+        String fragmentShaderSource = shaders.fragmentShaderSource();
+
+        createShaderProgram(vertexShaderSource, fragmentShaderSource);
     }
 
     private static void createShaderProgram(String vertexShaderSource, String fragmentShaderSource) {

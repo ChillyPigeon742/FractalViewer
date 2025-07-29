@@ -5,22 +5,19 @@ import net.alek.fractalviewer.transfer.event.payload.CloseAppPayload;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
-import net.alek.fractalviewer.transfer.request.Request;
+import net.alek.fractalviewer.transfer.request.type.Request;
 
 public class Ignition {
     static {
         Event.START_APP.subscribe(SubscribeMethod.SYNC, ignored -> startApp());
         Event.CLOSE_APP.subscribe(SubscribeMethod.SYNC, (CloseAppPayload p) -> closeApp(p.exitCode()));
-        Event.GUI_READY.subscribe(SubscribeMethod.SYNC, ignored -> Event.LOAD_GAME.publish(null));
     }
 
     private static void startApp() {
         Event.LOG.publish(new LogPayload(LogType.INFO, "Starting App..."));
         Event.LOG.publish(new LogPayload(LogType.INFO, "Fractal Viewer "+ Spark.getAppData().version()));
 
-        ErrorHandler.Exception(new Throwable());
-
-        Event.INIT_GUI.publish(null);
+        Event.INIT_GUI.publish();
     }
 
     private static void closeApp(int exitCode){
