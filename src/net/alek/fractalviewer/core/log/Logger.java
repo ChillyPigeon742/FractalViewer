@@ -1,6 +1,7 @@
 package net.alek.fractalviewer.core.log;
 
 import net.alek.fractalviewer.data.model.AppData;
+import net.alek.fractalviewer.transfer.event.EventBus;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
@@ -61,22 +62,13 @@ public class Logger {
 
     private static String getCallerInfo() {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-
         for (StackTraceElement element : stackTrace) {
             String className = element.getClassName();
-
-            if (
-                    className.startsWith("java.util.concurrent") ||
-                            className.equals(Logger.class.getName()) ||
-                            className.equals("net.alek.fractalviewer.transfer.event.EventBus")
-            ) {
-                continue;
+            if (!className.equals(Logger.class.getName()) && !className.equals(EventBus.class.getName()) && !className.equals(Event.class.getName())) {
+                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+                return simpleClassName + ":" + element.getLineNumber();
             }
-
-            String simpleName = className.substring(className.lastIndexOf('.') + 1);
-            return simpleName + ":" + element.getLineNumber();
         }
-
         return "UnknownCaller";
     }
 

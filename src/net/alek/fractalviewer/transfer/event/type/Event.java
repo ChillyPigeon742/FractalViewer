@@ -15,7 +15,6 @@ public enum Event {
     COMPILE_SHADERS(null),
     GENERATE_FRACTAL_DATA(null),
     UPLOAD_FRACTAL_DATA(null),
-    REFRESH_DRAW_DATA(DrawDataPayload.class),
     INITIALIZE_DRAW_CYCLE(null),
     MARK_DRAW_DIRTY(null),
     UNLOAD_SHADER_SOURCE(null),

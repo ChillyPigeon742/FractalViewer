@@ -15,7 +15,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lwjgl.version>3.3.6</lwjgl.version>
-        <joml-primitives.version>1.10.0</joml-primitives.version>
         <joml.version>1.10.8</joml.version>
 
         <compiler.version>3.13.0</compiler.version>
@@ -143,11 +142,6 @@
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-tinyfd</artifactId>
             <classifier>${lwjgl.natives}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml-primitives</artifactId>
-            <version>${joml-primitives.version}</version>
         </dependency>
         <dependency>
             <groupId>org.joml</groupId>

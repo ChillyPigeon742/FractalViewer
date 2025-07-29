@@ -1,10 +1,7 @@
 package net.alek.fractalviewer.core;
 
 import net.alek.fractalviewer.core.log.LogType;
-import net.alek.fractalviewer.transfer.event.payload.DrawDataPayload;
 import net.alek.fractalviewer.transfer.event.payload.LogPayload;
-import net.alek.fractalviewer.transfer.request.payload.FractalDataPayload;
-import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 import net.alek.fractalviewer.transfer.request.payload.WindowDataPayload;
 import net.alek.fractalviewer.transfer.event.type.Event;
 import net.alek.fractalviewer.transfer.event.type.SubscribeMethod;
@@ -26,16 +23,6 @@ public class Glow {
         Request.GET_WINDOW_DATA.handle(Glow::getWindowData);
     }
 
-    private static void refreshRenderData() {
-        ShaderProgramPayload shaderProgramPayload =
-                (ShaderProgramPayload) Request.GET_SHADER_PROGRAM.request().await().get();
-        FractalDataPayload fractalDataPayload =
-                (FractalDataPayload) Request.GET_FRACTAL_DATA.request().await().get();
-
-        Event.REFRESH_DRAW_DATA.publish(
-                new DrawDataPayload(getWindowData(), shaderProgramPayload, fractalDataPayload)).await();
-    }
-
     private static void createWindow() {
         initGLFW();
         createGLFWWindow();
@@ -46,9 +33,8 @@ public class Glow {
         Event.GENERATE_FRACTAL_DATA.publish().await();
         Event.UPLOAD_FRACTAL_DATA.publish().await();
 
-        refreshRenderData();
-        Event.INITIALIZE_DRAW_CYCLE.publish().await();
         Event.MARK_DRAW_DIRTY.publish();
+        Event.INITIALIZE_DRAW_CYCLE.publish();
     }
 
     private static void initGLFW() {
@@ -70,6 +56,8 @@ public class Glow {
             throw new RuntimeException("Failed to create GLFW window");
         }
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+        assert vidmode != null;
         int xpos = (vidmode.width() - width) / 2;
         int ypos = (vidmode.height() - height) / 2;
         glfwSetWindowPos(window, xpos, ypos);
@@ -88,7 +76,6 @@ public class Glow {
 
             width = widt;
             height = heigh;
-            refreshRenderData();
             Event.MARK_DRAW_DIRTY.publish();
         });
 
