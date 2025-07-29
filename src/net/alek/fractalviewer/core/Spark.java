@@ -16,7 +16,6 @@ import java.util.*;
 
 public class Spark {
     private static AppData appData;
-    private static final String DEFAULTS_PATH = "/assets/fractalviewer/config/default/";
 
     public static void main(String[] args) {
         boolean debug = args.length > 0 && "-debug".equals(args[0]);
@@ -78,7 +77,8 @@ public class Spark {
     private static void createFile(Path filePath){
         String fileName = String.valueOf(filePath.getFileName());
         if (Files.notExists(filePath)) {
-            try (var inSettings = Spark.class.getResourceAsStream( DEFAULTS_PATH + fileName)) {
+            try (var inSettings = Spark.class.getResourceAsStream(
+                    "/assets/fractalviewer/config/default/" + fileName)) {
                 Objects.requireNonNull(inSettings, "Default " + fileName +" resource not found");
                 Files.copy(inSettings, filePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException | NullPointerException e) {

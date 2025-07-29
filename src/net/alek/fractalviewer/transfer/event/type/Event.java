@@ -11,15 +11,15 @@ public enum Event {
     START_APP(null),
     LOG(LogPayload.class),
     INIT_GUI(null),
-    GUI_READY(null),
-    LOAD_GAME(null),
+    LOAD_SHADER_SOURCE(null),
     COMPILE_SHADERS(null),
     GENERATE_FRACTAL_DATA(null),
     UPLOAD_FRACTAL_DATA(null),
     REFRESH_DRAW_DATA(DrawDataPayload.class),
     INITIALIZE_DRAW_CYCLE(null),
     MARK_DRAW_DIRTY(null),
-    UNLOAD_GAME(null),
+    UNLOAD_SHADER_SOURCE(null),
+    CLEANUP_FRACTAL_DATA(null),
     CLOSE_APP(CloseAppPayload.class);
 
     private final Class<? extends Record> payloadType;

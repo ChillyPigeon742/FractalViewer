@@ -5,23 +5,64 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.alek</groupId>
-    <artifactId>FractalViewer</artifactId>
+    <artifactId>fractalviewer</artifactId>
     <version>1.0.0</version>
 
     <properties>
         <app.version>${project.version}</app.version>
+        <mod.dir>target/mods</mod.dir>
+        <native.dir>target/natives</native.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lwjgl.version>3.3.6</lwjgl.version>
         <joml-primitives.version>1.10.0</joml-primitives.version>
         <joml.version>1.10.8</joml.version>
-        <lwjgl.natives>natives-windows</lwjgl.natives>
 
         <compiler.version>3.13.0</compiler.version>
         <resource.filtering.version>3.3.1</resource.filtering.version>
         <jar.plugin.version>3.4.1</jar.plugin.version>
         <dependency.plugin.version>3.6.0</dependency.plugin.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>lwjgl-natives-linux-amd64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>natives-linux</lwjgl.natives>
+            </properties>
+        </profile>
+        <profile>
+            <id>lwjgl-natives-macos-aarch64</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>natives-macos-arm64</lwjgl.natives>
+            </properties>
+        </profile>
+        <profile>
+            <id>lwjgl-natives-windows-amd64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <lwjgl.natives>natives-windows</lwjgl.natives>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -164,25 +205,88 @@
                             <mainClass>net.alek.fractalviewer.core.Spark</mainClass>
                         </manifest>
                     </archive>
-                    <outputDirectory>${project.build.directory}/mods</outputDirectory>
+                    <outputDirectory>${mod.dir}</outputDirectory>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${dependency.plugin.version}</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
+                        <id>copy-mods</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/mods</outputDirectory>
                             <includeScope>runtime</includeScope>
+                            <excludeClassifiers>natives-windows,natives-linux,natives-macos,natives-macos-arm64,natives</excludeClassifiers>
+                            <outputDirectory>${mod.dir}</outputDirectory>
                         </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>extract-natives</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeClassifiers>natives-windows,natives-linux,natives-macos,natives-macos-arm64,natives</includeClassifiers>
+                            <outputDirectory>${project.build.directory}/natives-temp</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <property environment="env"/>
+
+                                <condition property="is.windows">
+                                    <os family="windows"/>
+                                </condition>
+                                <condition property="is.linux">
+                                    <os family="unix"/>
+                                </condition>
+                                <condition property="is.macos">
+                                    <os family="mac"/>
+                                </condition>
+
+                                <mkdir dir="${native.dir}/windows"/>
+                                <mkdir dir="${native.dir}/linux"/>
+                                <mkdir dir="${native.dir}/macos"/>
+
+                                <copy todir="${native.dir}/windows" flatten="true" failonerror="false" verbose="true" >
+                                    <fileset dir="${project.build.directory}/natives-temp" includes="**/*.dll"/>
+                                </copy>
+
+                                <copy todir="${native.dir}/linux" flatten="true" failonerror="false" verbose="true" >
+                                    <fileset dir="${project.build.directory}/natives-temp" includes="**/*.so"/>
+                                </copy>
+
+                                <copy todir="${native.dir}/macos" flatten="true" failonerror="false" verbose="true" >
+                                    <fileset dir="${project.build.directory}/natives-temp" includes="**/*.dylib"/>
+                                </copy>
+
+                                <delete>
+                                    <fileset dir="${project.build.directory}/natives-temp" includes="**/*"/>
+                                    <dirset dir="${project.build.directory}/natives-temp"/>
+                                </delete>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

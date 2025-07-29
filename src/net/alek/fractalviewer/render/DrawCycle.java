@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
 
 public class DrawCycle {
-    private static volatile boolean redraw = false;
+    private static volatile boolean redraw = true;
 
     private static long window;
     private static int width;
@@ -47,41 +47,37 @@ public class DrawCycle {
         aspectRatioLoc = fractalData.aspectRatioLoc();
     }
 
-    private static void initializeDrawCycle() {
-        while (!glfwWindowShouldClose(window)) {
-            if (redraw) {
-                glfwPollEvents();
-                DrawCycle.render();
-                redraw = false;
-            } else {
-                glfwWaitEvents();
-            }
-        }
-    }
-
      private static void render() {
-        if (redraw) {
-            glClear(GL_COLOR_BUFFER_BIT);
+         glClear(GL_COLOR_BUFFER_BIT);
 
-            glUseProgram(shaderProgram);
-            glBindVertexArray(vao);
+         glUseProgram(shaderProgram);
+         glBindVertexArray(vao);
 
-            float aspectRatio = (float) width / (float) height;
-            glUniform2f(resolutionLoc, (float) width, (float) height);
-            glUniform1f(invMaxIterLoc, 1.0f / 50.0f);
-            glUniform1f(aspectRatioLoc, aspectRatio);
+         float aspectRatio = (float) width / (float) height;
+         glUniform2f(resolutionLoc, (float) width, (float) height);
+         glUniform1f(invMaxIterLoc, 1.0f / 50.0f);
+         glUniform1f(aspectRatioLoc, aspectRatio);
 
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            glBindVertexArray(0);
-            glUseProgram(0);
+         glBindVertexArray(0);
+         glUseProgram(0);
 
-            glfwSwapBuffers(window);
-            redraw = false;
-        }
+         glfwSwapBuffers(window);
     }
 
     private static void markDirty() {
         redraw = true;
+        System.out.println("df");
+    }
+
+    private static void initializeDrawCycle() {
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+            if (redraw) {
+                render();
+                redraw = false;
+            }
+        }
     }
 }

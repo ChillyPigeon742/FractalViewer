@@ -26,7 +26,7 @@ public class FractalData {
     static {
         Event.GENERATE_FRACTAL_DATA.subscribe(SubscribeMethod.SYNC, ignored -> generateGLData());
         Event.UPLOAD_FRACTAL_DATA.subscribe(SubscribeMethod.SYNC, ignored -> uploadGLData());
-        Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> cleanupGLData());
+        Event.CLEANUP_FRACTAL_DATA.subscribe(SubscribeMethod.SYNC, ignored -> cleanupGLData());
 
         Request.GET_FRACTAL_DATA.handle(FractalData::getFractalData);
     }

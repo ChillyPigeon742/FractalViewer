@@ -53,9 +53,8 @@ public class EventBus {
         if (handlers != null) {
             for (Subscriber<?> subscriber : handlers) {
                 if (subscriber.mode == SubscribeMethod.ASYNC) {
-                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                        ((Consumer<T>) subscriber.handler).accept(payload);
-                    }, executor);
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
+                            ((Consumer<T>) subscriber.handler).accept(payload), executor);
                     futures.add(future);
                 } else {
                     ((Consumer<T>) subscriber.handler).accept(payload);
@@ -64,14 +63,6 @@ public class EventBus {
         }
 
         return new Awaitable(futures);
-    }
-
-    private <T extends Record> void deliver(Subscriber<T> subscriber, T payload) {
-        if (subscriber.mode == SubscribeMethod.ASYNC) {
-            executor.submit(() -> subscriber.handler.accept(payload));
-        } else {
-            subscriber.handler.accept(payload);
-        }
     }
 
     public void shutdown() {

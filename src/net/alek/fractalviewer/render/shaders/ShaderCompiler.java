@@ -9,7 +9,7 @@ import net.alek.fractalviewer.transfer.request.payload.ShaderProgramPayload;
 import static org.lwjgl.opengl.GL46.*;
 
 public class ShaderCompiler {
-    private static int shaderProgram;
+    public static int shaderProgram;
 
     static {
         Event.COMPILE_SHADERS.subscribe(SubscribeMethod.SYNC, ignored -> compileShaders());
